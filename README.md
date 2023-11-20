@@ -27,7 +27,8 @@ List any dependencies or prerequisites that need to be installed before running 
    ```
 
 2. Copy & Paste the **.env.example**, and rename it to **.env**.
-3. Update the firebase credentials. Get it from ... and store it inside **storage/app**, if you don't already have one.
+3. Store the firebase credentials inside **storage/app**.
+4. Update the firebase credentials path.
     ```
     FIREBASE_CREDENTIALS=storage/app/firebase-auth.json
     ```
