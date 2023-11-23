@@ -32,11 +32,7 @@ class FirebaseController extends Controller
                 'message.is_admin' => ['required', 'boolean'],
             ]);
 
-            // Default read status
-            $message = $request->message;
-            $message['is_read'] = false;
-
-            $this->realtimeDatabaseService->storeMessage($request->admin_id, $request->customer_id, $message);
+            $this->realtimeDatabaseService->storeMessage($request->admin_id, $request->customer_id, $request->message);
 
             return new ApiSuccessResponse(
                 [],

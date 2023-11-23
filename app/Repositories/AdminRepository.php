@@ -17,6 +17,9 @@ class AdminRepository implements AdminRepositoryInterface
 
     public function storeMessage($adminId, $customerId, $message)
     {
+        $message['is_read'] = false;
+        $message['created_at'] = time();
+
         $adminsRef = $this->database->getReference($this->table);
         $adminRef = $adminsRef->getChild("admin_id_{$adminId}");
 
