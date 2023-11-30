@@ -26,9 +26,9 @@ class FirebaseController extends Controller
             $request->validate([
                 'admin_id' => ['required', 'integer'],
                 'customer_id' => ['required', 'integer'],
-                'message' => ['required', 'array:content,image_path,is_admin'],
-                'message.content' => ['required', 'string'],
-                'message.image_path' => ['nullable', 'string'],
+                'message' => ['required', 'array:content,image_url,is_admin'],
+                'message.content' => ['nullable', 'string', 'required_without_all:message.image_url'],
+                'message.image_url' => ['nullable', 'string', 'required_without_all:message.content'],
                 'message.is_admin' => ['required', 'boolean'],
             ]);
 
