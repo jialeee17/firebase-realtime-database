@@ -22,4 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Firebase APIs
 Route::prefix('/rtdb')->name('rtdb.')->group(function () {
     Route::post('/store-message', [FirebaseController::class, 'storeMessage']);
+    Route::delete('/delete-chat', [FirebaseController::class, 'deleteChat']);
 });

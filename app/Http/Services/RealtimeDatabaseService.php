@@ -18,4 +18,9 @@ class RealtimeDatabaseService
     {
         return $this->adminRepository->storeMessage($adminId, $customerId, $message);
     }
+
+    public function deleteChat($adminId, $customerId)
+    {
+        return $this->adminRepository->deleteChat($adminId, $customerId);
+    }
 }

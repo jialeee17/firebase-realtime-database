@@ -45,4 +45,26 @@ class FirebaseController extends Controller
             );
         }
     }
+
+    public function deleteChat(Request $request)
+    {
+        try {
+            $request->validate([
+                'admin_id' => ['required', 'integer'],
+                'customer_id' => ['required', 'integer'],
+            ]);
+
+            $this->realtimeDatabaseService->deleteChat($request->admin_id, $request->customer_id);
+
+            return new ApiSuccessResponse(
+                [],
+                'Chat deleted successfully!',
+            );
+        } catch (Exception $e) {
+            return new ApiErrorResponse(
+                $e->getMessage(),
+                $e,
+            );
+        }
+    }
 }

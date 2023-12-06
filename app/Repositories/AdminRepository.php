@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use Kreait\Firebase\Contract\Database;
 use App\Interfaces\AdminRepositoryInterface;
+use Exception;
 
 class AdminRepository implements AdminRepositoryInterface
 {
@@ -51,5 +52,22 @@ class AdminRepository implements AdminRepositoryInterface
         // Push the message
         $messagesRef = $customerRef->getChild("messages");
         $messagesRef->push($message);
+
+        return;
+    }
+
+    public function deleteChat($adminId, $customerId)
+    {
+        $adminsRef = $this->database->getReference($this->table);
+
+        $chatRef = $adminsRef->getChild("admin_id_{$adminId}/customers/customer_id_{$customerId}");
+
+        if (!$chatRef->getSnapshot()->exists()) {
+            throw new Exception('Chat reference not found!');
+        }
+
+        $chatRef->remove();
+
+        return;
     }
 }
