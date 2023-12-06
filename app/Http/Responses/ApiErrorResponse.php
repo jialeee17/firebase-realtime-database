@@ -21,7 +21,10 @@ class ApiErrorResponse implements Responsable
      */
     public function toResponse($request)
     {
-        $response = ['message' => $this->message];
+        $response = [
+            'status' => false,
+            'message' => $this->message
+        ];
 
         if (! is_null($this->exception) && config('app.debug')) {
             $response['debug'] = [

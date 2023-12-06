@@ -28,7 +28,7 @@ class ApiSuccessResponse implements Responsable
     {
         return response()->json(
             [
-                'status' => 'Success',
+                'status' => true,
                 'message' => $this->message,
                 'data' => $this->data,
             ],
