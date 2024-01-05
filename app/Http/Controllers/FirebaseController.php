@@ -26,13 +26,13 @@ class FirebaseController extends Controller
             $request->validate([
                 'admin_id' => ['required', 'integer'],
                 'customer_id' => ['required', 'integer'],
-                'message' => ['required', 'array:content,image_path,is_admin'],
-                'message.content' => ['nullable', 'string', 'required_without_all:message.image_path'],
-                'message.image_path' => ['nullable', 'string', 'required_without_all:message.content'],
-                'message.is_admin' => ['required', 'boolean'],
+                'customer_name' => ['nullable', 'string'],
+                'content' => ['nullable', 'string', 'required_without:image_path'],
+                'image_path' => ['nullable', 'string', 'required_without:content'],
+                'is_admin' => ['required', 'boolean'],
             ]);
 
-            $this->realtimeDatabaseService->storeMessage($request->admin_id, $request->customer_id, $request->message);
+            $this->realtimeDatabaseService->storeMessage($request->admin_id, $request->customer_id, $request->customer_name, $request->content, $request->image_path, $request->is_admin);
 
             return new ApiSuccessResponse(
                 [],
