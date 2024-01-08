@@ -75,6 +75,32 @@ class RealtimeDatabaseService
 
         return $message;
     }
+
+    public function updateReadStatus($adminId, $customerId, $targetRole)
+    {
+        $reference = $this->database->getReference("admins/$adminId/customers/$customerId/messages");
+
+        if ($reference->getSnapshot()->exists()) {
+            $messages = $reference->getValue();
+
+            foreach ($messages as $key => $message) {
+                $updatePath = "admins/$adminId/customers/$customerId/messages/$key/is_read";
+
+                if ($targetRole === 'admin' && $message['is_admin'] === true) {
+                    $this->database->getReference()->update([
+                        $updatePath => true
+                    ]);
+                } else if ($targetRole === 'customer' && $message['is_admin'] === false) {
+                    $this->database->getReference()->update([
+                        $updatePath => true
+                    ]);
+                } else {
+                    throw new Exception('Target role not found');
+                }
+            }
+        }
+
+        return [];
     }
 
     public function deleteChat($adminId, $customerId)

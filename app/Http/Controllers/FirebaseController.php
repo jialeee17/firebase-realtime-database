@@ -46,6 +46,29 @@ class FirebaseController extends Controller
         }
     }
 
+    public function updateReadStatus(Request $request)
+    {
+        try {
+            $request->validate([
+                'admin_id' => ['required', 'integer'],
+                'customer_id' => ['required', 'integer'],
+                'target_role' => ['required', 'string'],
+            ]);
+
+            $data = $this->realtimeDatabaseService->updateReadStatus($request->admin_id, $request->customer_id, $request->target_role);
+
+            return new ApiSuccessResponse(
+                $data,
+                'Update read status successfully!',
+            );
+        } catch (Exception $e) {
+            return new ApiErrorResponse(
+                $e->getMessage(),
+                $e,
+            );
+        }
+    }
+
     public function deleteChat(Request $request)
     {
         try {
