@@ -94,8 +94,6 @@ class RealtimeDatabaseService
                     $this->database->getReference()->update([
                         $updatePath => true
                     ]);
-                } else {
-                    throw new Exception('Target role not found');
                 }
             }
         }
