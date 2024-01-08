@@ -2,28 +2,28 @@
 
 namespace App\Http\Services;
 
-use Carbon\Carbon;
-use App\Repositories\AdminRepository;
+use Exception;
 use Kreait\Firebase\Contract\Database;
 
 class RealtimeDatabaseService
 {
     private $database;
-    private $adminRepository;
 
-    public function __construct(Database $database, AdminRepository $adminRepository)
+    public function __construct(Database $database)
     {
         $this->database = $database;
-        $this->adminRepository = $adminRepository;
     }
 
     public function storeMessage($adminId, $customerId, $customerName, $content, $imagePath, $isAdmin)
     {
+        $timestamp = time();
+
         $message = [
             'content' => $content,
             'image_path' => $imagePath,
             'is_admin' => $isAdmin ? true : false,
-            'created_at' => time(),
+            'is_read' => false,
+            'created_at' => $timestamp,
         ];
 
         $adminsRef = $this->database->getReference('admins');
@@ -35,7 +35,8 @@ class RealtimeDatabaseService
                 'customers' => [
                     $customerId => [
                         'name' => $customerName,
-                        'messages' => [$message]
+                        'messages' => [$message],
+                        'last_message_at' => $timestamp
                     ],
                 ],
             ]);
@@ -50,7 +51,8 @@ class RealtimeDatabaseService
         if (!$customerRef->getSnapshot()->exists()) {
             $customersRef->getChild($customerId)->set([
                 'name' => $customerName,
-                'messages' => [$message]
+                'messages' => [$message],
+                'last_message_at' => $timestamp
             ]);
 
             return;
@@ -61,9 +63,18 @@ class RealtimeDatabaseService
         $messagesRef->push($message);
 
         // Update customer name
-        $customersRef->getChild($customerId)->update(['name' => $customerName]);
+        if (!$isAdmin) {
+            $customersRef->getChild($customerId)->update([
+                'name' => $customerName,
+            ]);
+        }
 
-        return;
+        $customersRef->getChild($customerId)->update([
+            'last_message_at' => $timestamp
+        ]);
+
+        return $message;
+    }
     }
 
     public function deleteChat($adminId, $customerId)

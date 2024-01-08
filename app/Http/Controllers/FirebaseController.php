@@ -32,10 +32,10 @@ class FirebaseController extends Controller
                 'is_admin' => ['required', 'boolean'],
             ]);
 
-            $this->realtimeDatabaseService->storeMessage($request->admin_id, $request->customer_id, $request->customer_name, $request->content, $request->image_path, $request->is_admin);
+            $data = $this->realtimeDatabaseService->storeMessage($request->admin_id, $request->customer_id, $request->customer_name, $request->content, $request->image_path, $request->is_admin);
 
             return new ApiSuccessResponse(
-                [],
+                $data,
                 'Message stored successfully!',
             );
         } catch (Exception $e) {
