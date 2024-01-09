@@ -63,15 +63,15 @@ class RealtimeDatabaseService
         $messagesRef->push($message);
 
         // Update customer name
+        $updateData = [
+            'last_message_at' => $timestamp,
+        ];
+
         if (!$isAdmin) {
-            $customersRef->getChild($customerId)->update([
-                'name' => $customerName,
-            ]);
+            $updateData['name'] = $customerName;
         }
 
-        $customersRef->getChild($customerId)->update([
-            'last_message_at' => $timestamp
-        ]);
+        $customerRef->update($updateData);
 
         return $message;
     }
