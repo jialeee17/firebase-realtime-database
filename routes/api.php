@@ -20,8 +20,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Firebase APIs
-Route::prefix('/rtdb')->name('rtdb.')->group(function () {
-    Route::post('/store-message', [FirebaseController::class, 'storeMessage']);
-    Route::post('/update-read-status', [FirebaseController::class, 'updateReadStatus']);
-    Route::delete('/delete-chat', [FirebaseController::class, 'deleteChat']);
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::prefix('/rtdb')->name('rtdb.')->group(function () {
+        Route::post('/store-message', [FirebaseController::class, 'storeMessage']);
+        Route::post('/update-read-status', [FirebaseController::class, 'updateReadStatus']);
+        Route::delete('/delete-chat', [FirebaseController::class, 'deleteChat']);
+    });
 });
