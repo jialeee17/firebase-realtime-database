@@ -113,12 +113,14 @@ class RealtimeDatabaseService
             return;
         }
 
+        $data = $snapshot->getValue();
+
         $oldReference->update([
             'is_migrated' => true
         ]);
 
         // Migrate customer chat history
-        $data = $snapshot->getValue();
+        $data['is_migrated'] = false; // Reset migration status
         $newReference = $this->database->getReference("admins/$newAdminId/customers/$customerId");
 
         $newReference->set($data);
