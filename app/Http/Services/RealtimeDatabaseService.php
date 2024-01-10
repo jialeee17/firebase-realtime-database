@@ -17,52 +17,53 @@ class RealtimeDatabaseService
     public function storeMessage($adminId, $customerId, $customerName, $content, $imagePath, $isAdmin)
     {
         $timestamp = time();
-
         $message = [
             'content' => $content,
             'image_path' => $imagePath,
-            'is_admin' => $isAdmin ? true : false,
+            'is_admin' => (bool)$isAdmin,
             'is_read' => false,
             'created_at' => $timestamp,
         ];
 
-        $adminsRef = $this->database->getReference('admins');
-        $adminRef = $adminsRef->getChild($adminId);
+        $adminReference = $this->database->getReference("admins/$adminId");
+        $adminSnapshot = $adminReference->getSnapshot();
 
         // Ensure admin exists, create if not
-        if (!$adminRef->getSnapshot()->exists()) {
-            $adminsRef->getChild($adminId)->set([
+        if (!$adminSnapshot->exists()) {
+            $adminReference->set([
                 'customers' => [
                     $customerId => [
                         'name' => $customerName,
+                        'is_migrated' => false,
+                        'last_message_at' => $timestamp,
                         'messages' => [$message],
-                        'last_message_at' => $timestamp
                     ],
                 ],
             ]);
 
-            return;
+            return $message;
         }
-
-        $customersRef = $adminRef->getChild("customers");
-        $customerRef = $customersRef->getChild($customerId);
 
         // Ensure customer exists, create if not
-        if (!$customerRef->getSnapshot()->exists()) {
-            $customersRef->getChild($customerId)->set([
+        $customerSnapshot = $adminSnapshot->getChild("customers/$customerId");
+        $customerReference = $customerSnapshot->getReference();
+
+        if (!$customerSnapshot->exists()) {
+            $customerReference->set([
                 'name' => $customerName,
+                'is_migrated' => false,
+                'last_message_at' => $timestamp,
                 'messages' => [$message],
-                'last_message_at' => $timestamp
             ]);
 
-            return;
+            return $message;
         }
 
-        // Push the message
-        $messagesRef = $customerRef->getChild("messages");
-        $messagesRef->push($message);
+        // Insert new message into the messages list
+        $messagesReference = $customerSnapshot->getChild("messages")->getReference();
+        $messagesReference->push($message);
 
-        // Update customer name
+        // Update customer name, last_message_at,...
         $updateData = [
             'last_message_at' => $timestamp,
         ];
@@ -71,7 +72,7 @@ class RealtimeDatabaseService
             $updateData['name'] = $customerName;
         }
 
-        $customerRef->update($updateData);
+        $customerReference->update($updateData);
 
         return $message;
     }
