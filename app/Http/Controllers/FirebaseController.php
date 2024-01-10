@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Http\Responses\ApiErrorResponse;
 use App\Http\Responses\ApiSuccessResponse;
 use App\Http\Services\RealtimeDatabaseService;
@@ -25,6 +26,7 @@ class FirebaseController extends Controller
         try {
             $request->validate([
                 'admin_id' => ['required', 'integer'],
+                'admin_name' => ['nullable', 'string', Rule::requiredIf((bool)$request->is_admin)],
                 'customer_id' => ['required', 'integer'],
                 'customer_name' => ['nullable', 'string'],
                 'content' => ['nullable', 'string', 'required_without:image_path'],
@@ -32,7 +34,7 @@ class FirebaseController extends Controller
                 'is_admin' => ['required', 'boolean'],
             ]);
 
-            $data = $this->realtimeDatabaseService->storeMessage($request->admin_id, $request->customer_id, $request->customer_name, $request->content, $request->image_path, $request->is_admin);
+            $data = $this->realtimeDatabaseService->storeMessage($request->admin_id, $request->admin_name, $request->customer_id, $request->customer_name, $request->content, $request->image_path, $request->is_admin);
 
             return new ApiSuccessResponse(
                 $data,

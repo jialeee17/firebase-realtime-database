@@ -14,13 +14,14 @@ class RealtimeDatabaseService
         $this->database = $database;
     }
 
-    public function storeMessage($adminId, $customerId, $customerName, $content, $imagePath, $isAdmin)
+    public function storeMessage($adminId, $adminName, $customerId, $customerName, $content, $imagePath, $isAdmin)
     {
         $timestamp = time();
         $message = [
             'content' => $content,
             'image_path' => $imagePath,
             'is_admin' => (bool)$isAdmin,
+            'admin_name' => $adminName,
             'is_read' => false,
             'created_at' => $timestamp,
         ];
