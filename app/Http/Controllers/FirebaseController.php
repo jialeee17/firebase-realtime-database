@@ -69,6 +69,29 @@ class FirebaseController extends Controller
         }
     }
 
+    public function migrateCustomerMessages(Request $request)
+    {
+        try {
+            $request->validate([
+                'old_admin_id' => ['required', 'integer'],
+                'new_admin_id' => ['required', 'integer'],
+                'customer_id' => ['required', 'integer'],
+            ]);
+
+            $this->realtimeDatabaseService->migrateCustomerMessages($request->old_admin_id, $request->new_admin_id, $request->customer_id);
+
+            return new ApiSuccessResponse(
+                [],
+                'Migrate customer messages successfully!',
+            );
+        } catch (Exception $e) {
+            return new ApiErrorResponse(
+                $e->getMessage(),
+                $e,
+            );
+        }
+    }
+
     public function deleteChat(Request $request)
     {
         try {

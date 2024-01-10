@@ -102,8 +102,26 @@ class RealtimeDatabaseService
         return [];
     }
 
-    public function deleteChat($adminId, $customerId)
+    public function migrateCustomerMessages($oldAdminId, $newAdminId, $customerId)
     {
-        return $this->adminRepository->deleteChat($adminId, $customerId);
+        // Find customer chat history
+        $oldReference = $this->database->getReference("admins/$oldAdminId/customers/$customerId");
+        $snapshot = $oldReference->getSnapshot();
+
+        if (!$snapshot->exists()) {
+            return;
+        }
+
+        $oldReference->update([
+            'is_migrated' => true
+        ]);
+
+        // Migrate customer chat history
+        $data = $snapshot->getValue();
+        $newReference = $this->database->getReference("admins/$newAdminId/customers/$customerId");
+
+        $newReference->set($data);
+
+        return;
     }
 }
