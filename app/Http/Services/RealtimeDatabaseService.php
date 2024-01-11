@@ -35,7 +35,6 @@ class RealtimeDatabaseService
                 'customers' => [
                     $customerId => [
                         'name' => $customerName,
-                        'is_migrated' => false,
                         'last_message_at' => $timestamp,
                         'messages' => [$message],
                     ],
@@ -52,7 +51,6 @@ class RealtimeDatabaseService
         if (!$customerSnapshot->exists()) {
             $customerReference->set([
                 'name' => $customerName,
-                'is_migrated' => false,
                 'last_message_at' => $timestamp,
                 'messages' => [$message],
             ]);
@@ -115,15 +113,12 @@ class RealtimeDatabaseService
 
         $data = $snapshot->getValue();
 
-        $oldReference->update([
-            'is_migrated' => true
-        ]);
-
         // Migrate customer chat history
-        $data['is_migrated'] = false; // Reset migration status
         $newReference = $this->database->getReference("admins/$newAdminId/customers/$customerId");
 
         $newReference->set($data);
+
+        $oldReference->remove();
 
         return;
     }
