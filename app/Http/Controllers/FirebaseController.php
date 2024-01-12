@@ -26,7 +26,7 @@ class FirebaseController extends Controller
         try {
             $request->validate([
                 'admin_id' => ['required', 'integer'],
-                'admin_name' => ['nullable', 'string', Rule::requiredIf((bool)$request->is_admin)],
+                'admin_name' => ['nullable', 'string'],
                 'customer_id' => ['required', 'integer'],
                 'customer_name' => ['nullable', 'string'],
                 'content' => ['nullable', 'string', 'required_without:image_path'],
