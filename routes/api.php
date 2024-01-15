@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('/rtdb')->name('rtdb.')->group(function () {
         Route::post('/store-message', [FirebaseController::class, 'storeMessage']);
+        Route::post('/update-admin-name', [FirebaseController::class, 'updateAdminName']);
         Route::post('/update-read-status', [FirebaseController::class, 'updateReadStatus']);
         Route::post('/migrate-customer-messages', [FirebaseController::class, 'migrateCustomerMessages']);
         Route::delete('/delete-chat', [FirebaseController::class, 'deleteChat']);

@@ -48,6 +48,28 @@ class FirebaseController extends Controller
         }
     }
 
+    public function updateAdminName(Request $request)
+    {
+        try {
+            $request->validate([
+                'admin_id' => ['required', 'integer'],
+                'name' => ['required', 'string'],
+            ]);
+
+            $data = $this->realtimeDatabaseService->updateAdminName($request->admin_id, $request->name);
+
+            return new ApiSuccessResponse(
+                $data,
+                'Update admin name successfully!',
+            );
+        } catch (Exception $e) {
+            return new ApiErrorResponse(
+                $e->getMessage(),
+                $e,
+            );
+        }
+    }
+
     public function updateReadStatus(Request $request)
     {
         try {

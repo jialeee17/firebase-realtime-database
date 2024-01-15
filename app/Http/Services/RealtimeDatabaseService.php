@@ -2,7 +2,6 @@
 
 namespace App\Http\Services;
 
-use Exception;
 use Kreait\Firebase\Contract\Database;
 
 class RealtimeDatabaseService
@@ -23,6 +22,7 @@ class RealtimeDatabaseService
             'is_admin' => (bool)$isAdmin,
             'admin_name' => $adminName,
             'is_read' => false,
+            'aid' => $adminId, // To track which admin replys the message
             'created_at' => $timestamp,
         ];
 
@@ -74,6 +74,37 @@ class RealtimeDatabaseService
         $customerReference->update($updateData);
 
         return $message;
+    }
+
+    public function updateAdminName($aid, $name)
+    {
+        $reference = $this->database->getReference("admins");
+        $snapshot = $reference->getSnapshot();
+
+        if ($snapshot->exists()) {
+            $admins = $snapshot->getValue();
+
+            foreach ($admins as $adminId => $admin) {
+                if (!empty($admin['customers'])) {
+                    foreach ($admin['customers'] as $customerId => $customer) {
+                        if (!empty($customer['messages'])) {
+                            foreach ($customer['messages'] as $key => $message) {
+                                // Do not update previous admin name
+                                if ($message['aid'] == $aid && !empty($message['admin_name'])) {
+                                    $updatePath = "admins/$adminId/customers/$customerId/messages/$key/admin_name";
+
+                                    $this->database->getReference()->update([
+                                        $updatePath => $name
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return [];
     }
 
     public function updateReadStatus($adminId, $customerId, $targetRole)
