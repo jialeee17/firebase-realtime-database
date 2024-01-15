@@ -53,7 +53,7 @@ class FirebaseController extends Controller
         try {
             $request->validate([
                 'admin_id' => ['required', 'integer'],
-                'name' => ['required', 'string'],
+                'name' => ['nullable', 'string'],
             ]);
 
             $data = $this->realtimeDatabaseService->updateAdminName($request->admin_id, $request->name);
