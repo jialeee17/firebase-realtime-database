@@ -68,7 +68,7 @@ class RealtimeDatabaseService
             'last_message_at' => $timestamp,
         ];
 
-        if (!$isAdmin) {
+        if (!$isAdmin && $customerSnapshot->getChild('name')->getValue() !== $customerName) {
             $updateData['name'] = $customerName;
         }
 
