@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use Exception;
 use Kreait\Firebase\Contract\Database;
 
 class RealtimeDatabaseService
@@ -109,24 +110,28 @@ class RealtimeDatabaseService
 
     public function updateReadStatus($adminId, $customerId, $targetRole)
     {
-        $reference = $this->database->getReference("admins/$adminId/customers/$customerId/messages");
+        $path = "admins/$adminId/customers/$customerId/messages";
+        $reference = $this->database->getReference($path);
 
-        if ($reference->getSnapshot()->exists()) {
-            $messages = $reference->getValue();
+        if (!$reference->getSnapshot()->exists()) {
+            throw new Exception('Messages reference not found.');
+        }
 
-            foreach ($messages as $key => $message) {
-                $updatePath = "admins/$adminId/customers/$customerId/messages/$key/is_read";
+        $messages = $reference->getValue();
+        $updatePaths = [];
 
-                if ($targetRole === 'admin' && $message['is_admin'] === true) {
-                    $this->database->getReference()->update([
-                        $updatePath => true
-                    ]);
-                } else if ($targetRole === 'customer' && $message['is_admin'] === false) {
-                    $this->database->getReference()->update([
-                        $updatePath => true
-                    ]);
-                }
+        foreach ($messages as $key => $message) {
+            $updatePath = "$path/$key/is_read";
+
+            if ($targetRole === 'admin' && !$message['is_read'] && $message['is_admin']) {
+                $updatePaths[$updatePath] = true;
+            } else if ($targetRole === 'customer' && !$message['is_read'] && !$message['is_admin']) {
+                $updatePaths[$updatePath] = true;
             }
+        }
+
+        if (!empty($updatePaths)) {
+            $this->database->getReference()->update($updatePaths);
         }
 
         return [];
