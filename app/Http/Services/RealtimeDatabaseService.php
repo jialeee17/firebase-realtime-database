@@ -90,8 +90,10 @@ class RealtimeDatabaseService
                     foreach ($admin['customers'] as $customerId => $customer) {
                         if (!empty($customer['messages'])) {
                             foreach ($customer['messages'] as $key => $message) {
+                                $messageAid = $message['aid'] ?? null;
+
                                 // Do not update previous admin name
-                                if ($message['aid'] == $aid) {
+                                if (!empty($messageAid) && $messageAid == $aid) {
                                     $updatePath = "admins/$adminId/customers/$customerId/messages/$key/admin_name";
 
                                     $this->database->getReference()->update([
