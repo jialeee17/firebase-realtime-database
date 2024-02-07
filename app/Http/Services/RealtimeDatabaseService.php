@@ -10,10 +10,12 @@ use Kreait\Firebase\Contract\Database;
 class RealtimeDatabaseService
 {
     private $database;
+    private $hap2pyService;
 
-    public function __construct(Database $database)
+    public function __construct(Database $database, Hap2pyService $hap2pyService)
     {
         $this->database = $database;
+        $this->hap2pyService = $hap2pyService;
     }
 
     public function storeMessage($adminId, $adminName, $customerId, $customerName, $content, $imagePath, $isAdmin)
@@ -47,17 +49,12 @@ class RealtimeDatabaseService
 
         // Auto Reply Message
         if (!$isAdmin) {
-            $cmsUser = CmsUser::with('chatStatus')->where('id', $adminId)->first();
-
-            if (empty($cmsUser)) {
-                return;
-            }
-
-            $isOutOfBusinessHour = optional(SystemSetting::where('name', 'Out of Business Hour')->first())->value;
-            $chatStatus = $cmsUser->chatStatus;
+            $chatStatus = $this->hap2pyService->getCmsUserChatStatus($adminId);
+            $isOutOfBusinessHour = $this->hap2pyService->getBusinessHourStatus();
 
             if ($isOutOfBusinessHour == 1) {
-                $autoReplyContent  = optional($chatStatus->where('name', 'Out of Business Hour')->first())->auto_reply_msg;
+                $chatStatus = $this->hap2pyService->getChatStatusByName('Out of Business Hour');
+                $autoReplyContent  = $chatStatus['auto_reply_msg'];
             } elseif ($chatStatus->name !== 'Online') {
                 $autoReplyContent = $chatStatus->auto_reply_msg;
             }
