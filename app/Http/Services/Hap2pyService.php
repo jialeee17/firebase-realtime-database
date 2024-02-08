@@ -2,13 +2,10 @@
 
 namespace App\Http\Services;
 
-use App\Traits\Curl;
 use Illuminate\Support\Facades\Http;
 
 class Hap2pyService
 {
-    use Curl;
-
     public function getCmsUserChatStatus($params)
     {
         $url = env('HAP2PY_API_URL') . '/cms-user/get-cms-user-chat-status';
