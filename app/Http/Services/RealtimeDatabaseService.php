@@ -49,11 +49,19 @@ class RealtimeDatabaseService
 
         // Auto Reply Message
         if (!$isAdmin) {
-            $chatStatus = $this->hap2pyService->getCmsUserChatStatus($adminId);
-            $isOutOfBusinessHour = $this->hap2pyService->getBusinessHourStatus();
+            $chatStatus = $this->hap2pyService->getCmsUserChatStatus([
+                'aid' => $adminId,
+                'customer_id' => $customerId
+            ]);
+            $isOutOfBusinessHour = $this->hap2pyService->getBusinessHourStatus([
+                'customer_id' => $customerId
+            ]);
 
             if ($isOutOfBusinessHour == 1) {
-                $chatStatus = $this->hap2pyService->getChatStatusByName('Out of Business Hour');
+                $chatStatus = $this->hap2pyService->getChatStatusByName([
+                    'name' => 'Out of Business Hour',
+                    'customer_id' => $customerId
+                ]);
                 $autoReplyContent  = $chatStatus['auto_reply_msg'];
             } elseif ($chatStatus->name !== 'Online') {
                 $autoReplyContent = $chatStatus->auto_reply_msg;
