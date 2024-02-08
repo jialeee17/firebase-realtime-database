@@ -3,7 +3,7 @@
 namespace App\Http\Services;
 
 use App\Traits\Curl;
-use Exception;
+use Illuminate\Support\Facades\Http;
 
 class Hap2pyService
 {
@@ -11,31 +11,59 @@ class Hap2pyService
 
     public function getCmsUserChatStatus($params)
     {
-        $url = env('HAP2PY_API_URL') . '/post/get-cms-user-chat-status';
+        $url = env('HAP2PY_API_URL') . '/cms-user/get-cms-user-chat-status';
 
-        $response = $this->curl($url, $params);
-        $data = json_decode($response, true);
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . env('HAP2PY_API_TOKEN'),
+            'mobileType' => 'web',
+        ])
+            ->attach('aid', $params['aid'] ?? null)
+            ->acceptJson()
+            ->post($url);
 
-        return $data;
+        if (!$response->successful()) {
+            $response->throw();
+        }
+
+        return $response['data'] ?? [];
     }
 
     public function getChatStatusByName($params)
     {
-        $url = env('HAP2PY_API_URL') . '/post/get-chats-status-by-name';
+        $url = env('HAP2PY_API_URL') . '/general/get-chats-status-by-name';
 
-        $response = $this->curl($url, $params);
-        $data = json_decode($response, true);
+        $response = Http::withToken(env('HAP2PY_API_TOKEN'))
+            ->withHeaders([
+                'Authorization' => 'Basic ' . env('HAP2PY_API_TOKEN'),
+                'mobileType' => 'web',
+            ])
+            ->attach('name', $params['name'] ?? null)
+            ->acceptJson()
+            ->post($url);
 
-        return $data;
+        if (!$response->successful()) {
+            $response->throw();
+        }
+
+        return $response['data'] ?? [];
     }
 
-    public function getBusinessHourStatus($params)
+    public function getBusinessHourStatus()
     {
-        $url = env('HAP2PY_API_URL') . '/post/get-business-hour-status';
+        $url = env('HAP2PY_API_URL') . '/general/get-business-hour-status';
 
-        $response = $this->curl($url, $params);
-        $data = json_decode($response, true);
+        $response = Http::withToken(env('HAP2PY_API_TOKEN'))
+            ->withHeaders([
+                'Authorization' => 'Basic ' . env('HAP2PY_API_TOKEN'),
+                'mobileType' => 'web',
+            ])
+            ->acceptJson()
+            ->post($url);
 
-        return $data;
+        if (!$response->successful()) {
+            $response->throw();
+        }
+
+        return $response['data'] ?? [];
     }
 }
