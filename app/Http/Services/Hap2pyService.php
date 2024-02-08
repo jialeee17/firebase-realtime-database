@@ -29,8 +29,7 @@ class Hap2pyService
     {
         $url = env('HAP2PY_API_URL') . '/general/get-chats-status-by-name';
 
-        $response = Http::withToken(env('HAP2PY_API_TOKEN'))
-            ->withHeaders([
+        $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . env('HAP2PY_API_TOKEN'),
                 'mobileType' => 'web',
             ])
@@ -49,8 +48,7 @@ class Hap2pyService
     {
         $url = env('HAP2PY_API_URL') . '/general/get-business-hour-status';
 
-        $response = Http::withToken(env('HAP2PY_API_TOKEN'))
-            ->withHeaders([
+        $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . env('HAP2PY_API_TOKEN'),
                 'mobileType' => 'web',
             ])
